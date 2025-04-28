@@ -39,20 +39,20 @@ const GameOver: React.FC = () => {
         recycle={false}
         numberOfPieces={300}
         gravity={0.2}
-        colors={['#FF5555', '#FF9933', '#FFDD44', '#44CC44', '#3399FF', '#9955FF']}
+        colors={['#FF6B6B', '#FF9F4A', '#FFE66D', '#4ECDC4', '#3F88C5', '#7CB9E8']}
       />
       
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", duration: 0.5 }}
-        className="bg-gradient-to-br from-pink-100 to-purple-200 p-8 rounded-2xl shadow-2xl border-4 border-white/20 max-w-md w-full mx-4"
+        className="bg-gradient-to-br from-blue-100 to-cyan-200 p-8 rounded-2xl shadow-2xl border-4 border-white/20 max-w-md w-full mx-4"
       >
         <div className="text-center">
           <motion.h2
             initial={{ y: -20 }}
             animate={{ y: 0 }}
-            className="text-3xl font-bold text-purple-800 mb-2"
+            className="text-3xl font-bold text-blue-800 mb-2"
           >
             Game Over!
           </motion.h2>
@@ -62,7 +62,7 @@ const GameOver: React.FC = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-lg text-purple-700"
+              className="text-lg text-blue-700"
             >
               You reached level {level}
             </motion.div>
@@ -71,7 +71,7 @@ const GameOver: React.FC = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="candy-counter font-bold text-5xl my-4 text-pink-600"
+              className="bubble-counter font-bold text-5xl my-4 text-cyan-600"
             >
               {score}
               <span className="text-2xl ml-2">points</span>
@@ -81,13 +81,13 @@ const GameOver: React.FC = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
-              className="text-md text-purple-600 italic"
+              className="text-md text-blue-600 italic"
             >
               {score > 5000 
-                ? "Amazing! You're a candy crushing master!" 
+                ? "Amazing! You're a bubble popping champion!" 
                 : score > 2000 
-                  ? "Great job! You're getting good at this!" 
-                  : "Good effort! Keep practicing!"}
+                  ? "Great job! You're making waves!" 
+                  : "Good effort! Keep splashing away!"}
             </motion.div>
           </div>
           
@@ -101,7 +101,7 @@ const GameOver: React.FC = () => {
               variant="candy"
               size="xl"
               onClick={restart}
-              className="font-bold text-white shadow-lg"
+              className="font-bold text-white shadow-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
             >
               Play Again
             </Button>

@@ -7,34 +7,34 @@ import { useAudio } from "@/lib/stores/useAudio";
 const StartScreen: React.FC = () => {
   const { start } = useCandyGame();
   const { toggleMute, isMuted } = useAudio();
-  const [candies, setCandies] = useState<{ id: number; delay: number; color: string; x: number; y: number; size: number }[]>([]);
+  const [bubbles, setBubbles] = useState<{ id: number; delay: number; color: string; x: number; y: number; size: number }[]>([]);
   const [showInstructions, setShowInstructions] = useState(false);
   
-  const candyColors = [
-    "#FF5555", // red
-    "#FF9933", // orange
-    "#FFDD44", // yellow
-    "#44CC44", // green
-    "#3399FF", // blue
-    "#9955FF", // purple
+  const bubbleColors = [
+    "#4ECDC4", // teal
+    "#FF6B6B", // coral
+    "#FFE66D", // light yellow
+    "#1A535C", // dark teal
+    "#3F88C5", // blue
+    "#7CB9E8", // lighter blue
   ];
   
-  // Generate floating candy backgrounds
+  // Generate floating bubble backgrounds
   useEffect(() => {
-    const newCandies = [];
+    const newBubbles = [];
     
-    for (let i = 0; i < 20; i++) {
-      newCandies.push({
+    for (let i = 0; i < 25; i++) {
+      newBubbles.push({
         id: i,
         delay: Math.random() * 5,
-        color: candyColors[Math.floor(Math.random() * candyColors.length)],
+        color: bubbleColors[Math.floor(Math.random() * bubbleColors.length)],
         x: Math.random() * 100,
         y: Math.random() * 100,
-        size: Math.random() * 60 + 40
+        size: Math.random() * 70 + 30
       });
     }
     
-    setCandies(newCandies);
+    setBubbles(newBubbles);
   }, []);
   
   // Toggle instructions panel
@@ -43,35 +43,44 @@ const StartScreen: React.FC = () => {
   };
   
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-purple-900 to-pink-800 flex items-center justify-center overflow-hidden">
-      {/* Floating candy backgrounds */}
-      {candies.map(candy => (
+    <div className="fixed inset-0 bg-gradient-to-br from-blue-900 to-cyan-700 flex items-center justify-center overflow-hidden">
+      {/* Floating bubble backgrounds */}
+      {bubbles.map(bubble => (
         <motion.div
-          key={candy.id}
+          key={bubble.id}
           className="absolute rounded-full opacity-30"
+          style={{
+            boxShadow: `inset 0px -10px 20px rgba(0,0,0,0.3), inset 0px 5px 10px rgba(255,255,255,0.5)`,
+            background: `radial-gradient(circle at 30% 30%, ${bubble.color}ee, ${bubble.color}aa)`,
+          }}
           initial={{ 
-            left: `${candy.x}%`, 
-            top: `${candy.y}%`,
-            width: candy.size,
-            height: candy.size,
-            background: candy.color,
+            left: `${bubble.x}%`, 
+            top: `${bubble.y}%`,
+            width: bubble.size,
+            height: bubble.size,
           }}
           animate={{
-            y: [0, -100, 0],
-            rotate: [0, 360],
+            y: [0, -120, 0],
+            x: [0, Math.random() > 0.5 ? 20 : -20, 0],
+            scale: [1, 1.05, 0.95, 1],
           }}
           transition={{
             y: {
-              duration: 10 + candy.delay,
+              duration: 12 + bubble.delay,
               repeat: Infinity,
               ease: "easeInOut",
             },
-            rotate: {
-              duration: 20,
+            x: {
+              duration: 15 + bubble.delay,
               repeat: Infinity,
-              ease: "linear",
+              ease: "easeInOut", 
             },
-            delay: candy.delay,
+            scale: {
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut",
+            },
+            delay: bubble.delay,
           }}
         />
       ))}
@@ -87,18 +96,18 @@ const StartScreen: React.FC = () => {
           <motion.h1
             initial={{ y: -20 }}
             animate={{ y: 0 }}
-            className="text-5xl md:text-6xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-br from-pink-300 to-white"
+            className="text-5xl md:text-6xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-br from-cyan-300 to-white"
           >
-            Candy Crush
+            Bubble Blast
           </motion.h1>
           
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="text-xl text-pink-100 mb-8"
+            className="text-xl text-cyan-100 mb-8"
           >
-            Match candies and crush your high score!
+            Pop bubbles and splash your way to the top!
           </motion.div>
           
           <motion.div
@@ -111,7 +120,7 @@ const StartScreen: React.FC = () => {
               variant="candy"
               size="xl"
               onClick={start}
-              className="font-bold text-white min-w-32 sm:min-w-40"
+              className="font-bold text-white min-w-32 sm:min-w-40 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
             >
               Start Game
             </Button>
@@ -184,14 +193,14 @@ const StartScreen: React.FC = () => {
             className="bg-white rounded-xl p-6 max-w-md m-4"
             onClick={e => e.stopPropagation()}
           >
-            <h2 className="text-2xl font-bold text-purple-800 mb-4">How to Play</h2>
+            <h2 className="text-2xl font-bold text-blue-800 mb-4">How to Play</h2>
             
             <div className="space-y-4 text-gray-700">
-              <p>1. <span className="font-semibold">Match Candies:</span> Swap adjacent candies to make matches of 3 or more of the same color.</p>
+              <p>1. <span className="font-semibold">Match Bubbles:</span> Swap adjacent bubbles to make matches of 3 or more of the same color.</p>
               
-              <p>2. <span className="font-semibold">Score Points:</span> Each match earns you points. The more candies you match at once, the more points you get!</p>
+              <p>2. <span className="font-semibold">Score Points:</span> Each match earns you points. The more bubbles you match at once, the more points you get!</p>
               
-              <p>3. <span className="font-semibold">Create Special Candies:</span> Match 4 or more candies to create special candies with powerful effects.</p>
+              <p>3. <span className="font-semibold">Create Special Bubbles:</span> Match 4 or more bubbles to create special bubbles with powerful splash effects.</p>
               
               <p>4. <span className="font-semibold">Level Up:</span> Meet the target score before running out of moves to advance to the next level.</p>
               
@@ -202,6 +211,7 @@ const StartScreen: React.FC = () => {
               <Button
                 variant="candy"
                 onClick={toggleInstructions}
+                className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
               >
                 Got it!
               </Button>

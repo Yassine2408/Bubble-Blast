@@ -48,7 +48,7 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="flex flex-col h-full w-full overflow-hidden bg-gradient-to-b from-purple-600 to-purple-900">
+      <div className="flex flex-col h-full w-full overflow-hidden bg-gradient-to-b from-blue-800 to-cyan-600">
         {phase === "ready" && <StartScreen />}
         {phase === "playing" && <GameBoard />}
         {phase === "ended" && <GameOver />}

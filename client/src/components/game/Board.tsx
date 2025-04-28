@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useCandyGame } from "@/lib/stores/useCandyGame";
-import Candy from "./Candy";
+import Bubble from "./Bubble";
 import { useAudio } from "@/lib/stores/useAudio";
 
 const Board: React.FC = () => {
@@ -40,12 +40,23 @@ const Board: React.FC = () => {
   return (
     <div className="board-container relative w-full h-full flex items-center justify-center">
       <div 
-        className="game-board relative bg-gradient-to-br from-pink-100/80 to-purple-200/80 rounded-2xl p-2 shadow-2xl border-4 border-white/20"
+        className="game-board relative bg-gradient-to-br from-blue-100/80 to-cyan-200/80 rounded-2xl p-2 shadow-2xl border-4 border-white/20"
         style={{ 
           width: cellSize * level.cols,
           height: cellSize * level.rows,
+          backgroundImage: 'url("/textures/water-background.png")',
+          backgroundSize: 'cover',
+          backgroundBlendMode: 'soft-light',
         }}
       >
+        {/* Bubble-like grid pattern */}
+        <div className="absolute inset-0 bg-white/5 rounded-2xl"
+          style={{
+            backgroundImage: 'radial-gradient(circle, transparent 20%, rgba(255,255,255,0.03) 21%, rgba(255,255,255,0.03) 34%, transparent 35%, transparent)',
+            backgroundSize: `${cellSize * 0.8}px ${cellSize * 0.8}px`,
+          }}
+        />
+
         {board.map((row, rowIndex) => 
           row.map((candy, colIndex) => (
             <div 
@@ -59,7 +70,7 @@ const Board: React.FC = () => {
               onClick={() => selectCandy(rowIndex, colIndex)}
             >
               {candy && (
-                <Candy 
+                <Bubble 
                   candy={candy} 
                   size={cellSize} 
                 />
@@ -84,7 +95,7 @@ const Board: React.FC = () => {
           strokeWidth="2" 
           strokeLinecap="round" 
           strokeLinejoin="round"
-          className={isMuted ? "text-gray-400" : "text-purple-600"}
+          className={isMuted ? "text-gray-400" : "text-blue-600"}
         >
           {isMuted ? (
             <>

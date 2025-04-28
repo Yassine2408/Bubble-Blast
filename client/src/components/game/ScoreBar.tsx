@@ -15,12 +15,12 @@ const ScoreBar: React.FC = () => {
         className="flex flex-col"
       >
         <div className="flex justify-between items-center">
-          <h2 className="text-lg font-bold text-purple-800">Score</h2>
+          <h2 className="text-lg font-bold text-blue-800">Score</h2>
           <motion.span
             key={score}
             initial={{ scale: 1.2 }}
             animate={{ scale: 1 }}
-            className="text-3xl font-bold text-pink-600"
+            className="text-3xl font-bold text-cyan-600"
           >
             {score}
           </motion.span>
@@ -28,15 +28,15 @@ const ScoreBar: React.FC = () => {
         
         <div className="mt-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-md font-medium text-purple-700">Progress</h3>
-            <span className="text-sm font-medium text-purple-800">
+            <h3 className="text-md font-medium text-blue-700">Progress</h3>
+            <span className="text-sm font-medium text-blue-800">
               {score} / {currentLevel.targetScore}
             </span>
           </div>
           
           <div className="mt-2 w-full bg-gray-200 rounded-full h-2.5">
             <motion.div 
-              className="bg-gradient-to-r from-pink-500 to-purple-600 h-2.5 rounded-full"
+              className="bg-gradient-to-r from-cyan-500 to-blue-600 h-2.5 rounded-full"
               style={{ width: `${progress}%` }}
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
@@ -50,9 +50,9 @@ const ScoreBar: React.FC = () => {
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.8, opacity: 0 }}
-            className="mt-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-2 rounded-lg text-center"
+            className="mt-4 bg-gradient-to-r from-blue-400 to-cyan-500 text-white px-3 py-2 rounded-lg text-center"
           >
-            <span className="text-sm font-medium">Combo</span>
+            <span className="text-sm font-medium">Splash</span>
             <span className="text-xl font-bold ml-2">{combo}x</span>
           </motion.div>
         )}

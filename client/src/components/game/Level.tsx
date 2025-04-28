@@ -14,24 +14,24 @@ const Level: React.FC = () => {
         className="flex flex-col"
       >
         <div className="flex justify-between items-center">
-          <h2 className="text-lg font-bold text-purple-800">Level</h2>
-          <span className="text-3xl font-bold text-pink-600">{level}</span>
+          <h2 className="text-lg font-bold text-blue-800">Level</h2>
+          <span className="text-3xl font-bold text-cyan-600">{level}</span>
         </div>
         
         <div className="flex justify-between items-center mt-4">
-          <h3 className="text-md font-medium text-purple-700">Target</h3>
-          <span className="text-lg font-semibold text-purple-800">{currentLevel.targetScore} pts</span>
+          <h3 className="text-md font-medium text-blue-700">Target</h3>
+          <span className="text-lg font-semibold text-blue-800">{currentLevel.targetScore} pts</span>
         </div>
         
         <div className="mt-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-md font-medium text-purple-700">Moves Left</h3>
-            <span className="text-lg font-semibold text-purple-800">{movesLeft}</span>
+            <h3 className="text-md font-medium text-blue-700">Moves Left</h3>
+            <span className="text-lg font-semibold text-blue-800">{movesLeft}</span>
           </div>
           
           <div className="mt-2 w-full bg-gray-200 rounded-full h-2.5">
             <motion.div 
-              className="bg-gradient-to-r from-pink-500 to-purple-600 h-2.5 rounded-full"
+              className="bg-gradient-to-r from-cyan-500 to-blue-600 h-2.5 rounded-full"
               style={{ 
                 width: `${Math.min(100, Math.max(0, (movesLeft / currentLevel.moveLimit) * 100))}%` 
               }}
