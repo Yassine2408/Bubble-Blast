@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCandyGame } from "@/lib/stores/useCandyGame";
+import { useIsMobile } from "@/hooks/use-is-mobile";
 
 interface Particle {
   id: string;
@@ -9,35 +10,37 @@ interface Particle {
   scale: number;
   rotation: number;
   color: string;
-  type: 'bubble' | 'droplet' | 'splash';
+  type: 'droplet' | 'splash' | 'bubble';
 }
 
 const SpecialEffects: React.FC = () => {
   const { score, combo } = useCandyGame();
+  const isMobile = useIsMobile();
   const [particles, setParticles] = useState<Particle[]>([]);
   const [comboEffect, setComboEffect] = useState<{ active: boolean, value: number }>({ 
     active: false, 
     value: 0 
   });
   
-  const bubbleColors = ["#FF3333", "#FF8800", "#FFDD00", "#00BB00", "#0088FF", "#AA00FF"];
+  const bubbleColors = useMemo(() => 
+    ["#FF3333", "#FF8800", "#FFDD00", "#00BB00", "#0088FF", "#AA00FF"],
+    []
+  );
   
-  // Generate particles when score changes
+  // Generate particles when score changes with mobile optimization
   useEffect(() => {
-    // Don't generate particles on initial load
     if (score === 0) return;
     
-    // Generate random particles
-    const newParticles: Particle[] = [];
-    const count = Math.min(15, Math.floor(score / 100) + 5);
+    // Reduce particle count on mobile
+    const maxParticles = isMobile ? 8 : 15;
+    const count = Math.min(maxParticles, Math.floor(score / 100) + 5);
     
-    for (let i = 0; i < count; i++) {
-      // Randomly choose particle type
+    const newParticles: Particle[] = Array(count).fill(null).map((_, i) => {
       const particleType = Math.random() > 0.7 
         ? 'droplet' 
         : Math.random() > 0.4 ? 'splash' : 'bubble';
       
-      newParticles.push({
+      return {
         id: `particle-${Date.now()}-${i}`,
         x: Math.random() * window.innerWidth,
         y: Math.random() * window.innerHeight,
@@ -45,100 +48,82 @@ const SpecialEffects: React.FC = () => {
         rotation: Math.random() * 360,
         color: bubbleColors[Math.floor(Math.random() * bubbleColors.length)],
         type: particleType
-      });
-    }
+      };
+    });
     
     setParticles(prev => [...prev, ...newParticles]);
     
-    // Remove particles after animation
+    // Shorter animation duration on mobile
+    const duration = isMobile ? 1500 : 2000;
     const timer = setTimeout(() => {
       setParticles(prev => prev.filter(p => !newParticles.includes(p)));
-    }, 2000);
+    }, duration);
     
     return () => clearTimeout(timer);
-  }, [score]);
+  }, [score, isMobile, bubbleColors]);
   
-  // Show combo effect
+  // Optimized combo effect
   useEffect(() => {
     if (combo >= 2) {
       setComboEffect({ active: true, value: combo });
       
+      const duration = isMobile ? 1000 : 1500;
       const timer = setTimeout(() => {
         setComboEffect({ active: false, value: 0 });
-      }, 1500);
+      }, duration);
       
       return () => clearTimeout(timer);
     }
-  }, [combo]);
+  }, [combo, isMobile]);
 
-  // Render different particle types
-  const renderParticle = (particle: Particle) => {
+  // Memoized particle renderer
+  const renderParticle = useCallback((particle: Particle) => {
+    const size = isMobile ? '0.5rem' : '0.75rem';
+    
     switch (particle.type) {
-      case 'bubble':
-        return (
-          <div 
-            style={{ 
-              position: "absolute",
-              width: "20px",
-              height: "20px",
-              borderRadius: "50%",
-              background: `radial-gradient(circle at 30% 30%, ${particle.color}cc, ${particle.color}ff)`,
-              boxShadow: `inset 0px -3px 5px rgba(0,0,0,0.3), inset 0px 2px 5px rgba(255,255,255,0.5), 0 1px 2px rgba(0,0,0,0.3)`,
-              border: `1px solid rgba(255,255,255,0.3)`
-            }}
-          >
-            {/* Shine effect */}
-            <div 
-              className="absolute left-[15%] top-[15%] rounded-full opacity-80"
-              style={{
-                width: "30%",
-                height: "30%",
-                background: "radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 70%)"
-              }}
-            />
-          </div>
-        );
-      
       case 'droplet':
         return (
           <div
+            className="rounded-full"
             style={{
-              position: "absolute",
-              width: "14px",
-              height: "18px",
-              borderRadius: "70% 70% 60% 60% / 70% 70% 40% 40%",
-              background: `radial-gradient(circle at 40% 40%, rgba(255,255,255,0.8), ${particle.color}ee)`,
-              boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
-              transform: "rotate(20deg)",
+              width: size,
+              height: size,
+              background: `radial-gradient(circle at 30% 30%, white, ${particle.color})`,
+              boxShadow: `0 0 5px ${particle.color}`,
             }}
           />
         );
-        
       case 'splash':
         return (
-          <svg width="24" height="24" viewBox="0 0 24 24" style={{ position: "absolute" }}>
-            <circle cx="12" cy="12" r="2" fill="rgba(255,255,255,0.8)" />
-            <g stroke={particle.color} strokeWidth="1.5" strokeLinecap="round">
-              <line x1="12" y1="5" x2="12" y2="7" />
-              <line x1="12" y1="17" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="7" y2="12" />
-              <line x1="17" y1="12" x2="19" y2="12" />
-              <line x1="7.5" y1="7.5" x2="9" y2="9" />
-              <line x1="15" y1="15" x2="16.5" y2="16.5" />
-              <line x1="7.5" y1="16.5" x2="9" y2="15" />
-              <line x1="15" y1="9" x2="16.5" y2="7.5" />
-            </g>
-          </svg>
+          <div
+            className="transform rotate-45"
+            style={{
+              width: size,
+              height: size,
+              background: `radial-gradient(circle at 30% 30%, white, ${particle.color})`,
+              clipPath: 'polygon(0% 0%, 100% 0%, 50% 100%)',
+            }}
+          />
         );
-        
-      default:
-        return null;
+      default: // bubble
+        return (
+          <div
+            className="rounded-full"
+            style={{
+              width: size,
+              height: size,
+              background: `radial-gradient(circle at 30% 30%, ${particle.color}88, ${particle.color}ff)`,
+              border: '1px solid rgba(255,255,255,0.4)',
+              boxShadow: 'inset 0px -2px 5px rgba(0,0,0,0.2), inset 0px 2px 5px rgba(255,255,255,0.2)',
+            }}
+          />
+        );
     }
-  };
-  
+  }, [isMobile]);
+
   return (
     <div className="special-effects absolute inset-0 pointer-events-none overflow-hidden">
-      {/* Floating particles */}
+      {/* Floating particles with optimized animations */}
       <AnimatePresence>
         {particles.map(particle => (
           <motion.div
@@ -151,19 +136,24 @@ const SpecialEffects: React.FC = () => {
               opacity: 0 
             }}
             animate={{ 
-              y: particle.y - 100, 
+              y: particle.y - (isMobile ? 50 : 100), 
               scale: particle.scale,
               rotate: particle.rotation,
               opacity: [0, 1, 0] 
             }}
             exit={{ opacity: 0 }}
             transition={{ 
-              duration: 2, 
+              duration: isMobile ? 1.5 : 2,
               ease: "easeOut",
               opacity: {
                 times: [0, 0.2, 1],
-                duration: 2
+                duration: isMobile ? 1.5 : 2
               }
+            }}
+            style={{
+              position: 'absolute',
+              willChange: 'transform',
+              transform: 'translateZ(0)',
             }}
           >
             {renderParticle(particle)}
@@ -171,7 +161,7 @@ const SpecialEffects: React.FC = () => {
         ))}
       </AnimatePresence>
       
-      {/* Combo text effect */}
+      {/* Optimized combo text effect */}
       <AnimatePresence>
         {comboEffect.active && (
           <motion.div
@@ -179,15 +169,19 @@ const SpecialEffects: React.FC = () => {
             animate={{ scale: 1.2, opacity: 1, y: 0 }}
             exit={{ scale: 2, opacity: 0, y: -50 }}
             transition={{ 
-              duration: 1.5,
+              duration: isMobile ? 1 : 1.5,
               type: "spring",
               stiffness: 200,
               damping: 15 
             }}
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+            style={{
+              willChange: 'transform',
+              transform: 'translateZ(0)',
+            }}
           >
             <div 
-              className="text-4xl md:text-6xl font-bold"
+              className={`font-bold ${isMobile ? 'text-3xl' : 'text-4xl md:text-6xl'}`}
               style={{
                 color: "#0088FF",
                 textShadow: "0 0 10px rgba(0,136,255,0.7), 0 0 20px rgba(0,136,255,0.5), 0 2px 0 #0055BB, 0 4px 0 rgba(0,0,0,0.2)"
@@ -202,4 +196,4 @@ const SpecialEffects: React.FC = () => {
   );
 };
 
-export default SpecialEffects;
+export default React.memo(SpecialEffects);

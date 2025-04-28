@@ -125,57 +125,39 @@ export const useCandyGame = create<GameState>()(
       set({ phase: "ended" });
     },
     
-    createBoard: (rows, cols) => {
-      // Generate a new board with random candies
-      const newBoard: BoardType = Array(rows).fill(null).map(() => Array(cols).fill(null));
+    createBoard: (rows: number, cols: number) => {
+      const newBoard: BoardType = Array(rows).fill(null).map(() => 
+        Array(cols).fill(null).map(() => ({
+          type: CANDY_TYPES[Math.floor(Math.random() * CANDY_TYPES.length)],
+          isMatched: false,
+          isSelected: false,
+          isNew: true,
+          isAnimating: false,
+          isSpecial: false
+        }))
+      );
       
-      for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-          // Avoid creating immediate matches when generating the board
-          let availableTypes = [...CANDY_TYPES];
-          
-          // Check horizontal
-          if (col >= 2) {
-            if (newBoard[row][col-1]?.type === newBoard[row][col-2]?.type) {
-              availableTypes = availableTypes.filter(type => type !== newBoard[row][col-1]?.type);
-            }
-          }
-          
-          // Check vertical
-          if (row >= 2) {
-            if (newBoard[row-1][col]?.type === newBoard[row-2][col]?.type) {
-              availableTypes = availableTypes.filter(type => type !== newBoard[row-1][col]?.type);
-            }
-          }
-          
-          // If we've filtered out all types, just use any type
-          if (availableTypes.length === 0) {
-            availableTypes = [...CANDY_TYPES];
-          }
-          
-          // Pick a random type from the available types
-          const randomType = availableTypes[Math.floor(Math.random() * availableTypes.length)];
-          
-          newBoard[row][col] = {
-            id: `candy-${row}-${col}-${Date.now()}`,
-            type: randomType,
-            isNew: true
-          };
+      // Pre-check and regenerate board if it has matches
+      let boardHasMatches = true;
+      let attempts = 0;
+      let finalBoard = newBoard;
+      
+      while (boardHasMatches && attempts < 5) {
+        const { hasMatches } = checkForMatches(finalBoard, get().getCurrentLevelConfig().specialCandyThreshold);
+        if (!hasMatches) {
+          boardHasMatches = false;
+        } else {
+          finalBoard = finalBoard.map(row => 
+            row.map(candy => ({
+              ...candy!,
+              type: CANDY_TYPES[Math.floor(Math.random() * CANDY_TYPES.length)]
+            }))
+          );
         }
+        attempts++;
       }
       
-      set({ board: newBoard });
-      
-      // After a short delay, remove the "new" flag from all candies
-      setTimeout(() => {
-        set(state => ({
-          board: state.board.map(row => 
-            row.map(candy => 
-              candy ? { ...candy, isNew: false } : null
-            )
-          )
-        }));
-      }, 500);
+      set({ board: finalBoard });
     },
     
     selectCandy: (row, col) => {
@@ -299,31 +281,34 @@ export const useCandyGame = create<GameState>()(
         useAudio.getState().playPop();
       }
       
-      // Update the board with matched candies
-      set({ 
+      // Batch state updates
+      set(state => ({ 
         board: matchedBoard,
-        score: score + scoreEarned,
-        combo: combo + 1
-      });
+        score: state.score + scoreEarned,
+        combo: state.combo + 1
+      }));
       
-      // Wait for match animation
-      await new Promise(resolve => setTimeout(resolve, 400));
+      // Optimize animation timing based on device performance
+      const animationDelay = window.matchMedia('(max-width: 768px)').matches ? 300 : 400;
+      
+      // Wait for match animation with reduced time on mobile
+      await new Promise(resolve => setTimeout(resolve, animationDelay));
       
       // Apply gravity to make candies fall
       const boardAfterGravity = applyGravity(matchedBoard);
       set({ board: boardAfterGravity });
       
-      // Wait for gravity animation
-      await new Promise(resolve => setTimeout(resolve, 300));
+      // Reduced gravity animation time
+      await new Promise(resolve => setTimeout(resolve, animationDelay * 0.75));
       
-      // Generate new candies to fill empty spaces
+      // Generate new candies with optimized animation
       const { boardWithNewCandies } = generateNewCandies(boardAfterGravity, CANDY_TYPES);
       set({ board: boardWithNewCandies });
       
-      // Wait for new candies animation
-      await new Promise(resolve => setTimeout(resolve, 300));
+      // Reduced new candies animation time
+      await new Promise(resolve => setTimeout(resolve, animationDelay * 0.75));
       
-      // Clear the "new" flag from candies
+      // Batch update for clearing new flags
       set(state => ({
         board: state.board.map(row => 
           row.map(candy => 
@@ -332,7 +317,7 @@ export const useCandyGame = create<GameState>()(
         )
       }));
       
-      // Check for cascading matches
+      // Process cascading matches with optimized timing
       const hasCascadingMatches = await get().processMatches();
       
       if (!hasCascadingMatches) {

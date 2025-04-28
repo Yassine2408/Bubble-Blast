@@ -1,41 +1,73 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useCandyGame } from "@/lib/stores/useCandyGame";
 import Bubble from "./Bubble";
 import { useAudio } from "@/lib/stores/useAudio";
+import { useIsMobile } from "@/hooks/use-is-mobile";
 
 const Board: React.FC = () => {
   const { board, selectCandy, getCurrentLevelConfig } = useCandyGame();
   const level = getCurrentLevelConfig();
   const { isMuted, toggleMute } = useAudio();
+  const isMobile = useIsMobile();
   const [boardSize, setBoardSize] = useState({ width: 0, height: 0 });
+  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
   
-  // Calculate the board size based on the container
-  useEffect(() => {
-    const updateBoardSize = () => {
-      const container = document.querySelector('.board-container');
-      if (container) {
-        const rect = container.getBoundingClientRect();
-        const size = Math.min(rect.width, rect.height);
-        setBoardSize({ width: size, height: size });
-      }
-    };
+  // Calculate the board size based on the container and device
+  const updateBoardSize = useCallback(() => {
+    const container = document.querySelector('.board-container');
+    if (container) {
+      const rect = container.getBoundingClientRect();
+      const size = Math.min(rect.width, rect.height);
+      setBoardSize({ width: size, height: size });
+    }
+  }, []);
 
+  useEffect(() => {
     updateBoardSize();
-    window.addEventListener('resize', updateBoardSize);
+    const debouncedResize = debounce(updateBoardSize, 100);
+    window.addEventListener('resize', debouncedResize);
     
     return () => {
-      window.removeEventListener('resize', updateBoardSize);
+      window.removeEventListener('resize', debouncedResize);
     };
-  }, [level.rows, level.cols]);
+  }, [level.rows, level.cols, updateBoardSize]);
+
+  // Handle touch events for mobile
+  const handleTouchStart = (e: React.TouchEvent, rowIndex: number, colIndex: number) => {
+    setTouchStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent, rowIndex: number, colIndex: number) => {
+    if (!touchStart) return;
+    
+    const touchEnd = {
+      x: e.changedTouches[0].clientX,
+      y: e.changedTouches[0].clientY
+    };
+    
+    const dx = touchEnd.x - touchStart.x;
+    const dy = touchEnd.y - touchStart.y;
+    
+    // Only select if it's a tap (small movement)
+    if (Math.abs(dx) < 10 && Math.abs(dy) < 10) {
+      selectCandy(rowIndex, colIndex);
+    }
+    
+    setTouchStart(null);
+  };
+
+  // Memoize cell size calculation
+  const cellSize = useMemo(() => 
+    Math.min(
+      boardSize.width / level.cols,
+      boardSize.height / level.rows
+    ),
+    [boardSize.width, boardSize.height, level.cols, level.rows]
+  );
 
   if (!board || board.length === 0) {
     return <div>Loading...</div>;
   }
-
-  const cellSize = Math.min(
-    boardSize.width / level.cols,
-    boardSize.height / level.rows
-  );
 
   return (
     <div className="board-container relative w-full h-full flex items-center justify-center">
@@ -47,6 +79,7 @@ const Board: React.FC = () => {
           backgroundImage: 'url("/textures/water-pattern.svg")',
           backgroundSize: 'cover',
           backgroundBlendMode: 'soft-light',
+          touchAction: 'none', // Prevent browser handling of touch events
         }}
       >
         {/* Bubble-like grid pattern */}
@@ -66,8 +99,11 @@ const Board: React.FC = () => {
                 width: cellSize,
                 height: cellSize,
                 transform: `translate(${colIndex * cellSize}px, ${rowIndex * cellSize}px)`,
+                willChange: 'transform',
               }}
               onClick={() => selectCandy(rowIndex, colIndex)}
+              onTouchStart={(e) => handleTouchStart(e, rowIndex, colIndex)}
+              onTouchEnd={(e) => handleTouchEnd(e, rowIndex, colIndex)}
             >
               {candy && (
                 <Bubble 
@@ -119,4 +155,17 @@ const Board: React.FC = () => {
   );
 };
 
-export default Board;
+// Utility function for debouncing
+function debounce(func: Function, wait: number) {
+  let timeout: NodeJS.Timeout;
+  return function executedFunction(...args: any[]) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+export default React.memo(Board);

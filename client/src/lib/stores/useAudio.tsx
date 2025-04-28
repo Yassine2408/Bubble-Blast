@@ -7,9 +7,9 @@ interface AudioState {
   isMuted: boolean;
   
   // Setter functions
-  setBackgroundMusic: (music: HTMLAudioElement) => void;
-  setPopSound: (sound: HTMLAudioElement) => void; // Renamed from setHitSound
-  setSplashSound: (sound: HTMLAudioElement) => void; // Renamed from setSuccessSound
+  setBackgroundMusic: (audio: HTMLAudioElement) => void;
+  setPopSound: (audio: HTMLAudioElement) => void; // Renamed from setHitSound
+  setSplashSound: (audio: HTMLAudioElement) => void; // Renamed from setSuccessSound
   
   // Control functions
   toggleMute: () => void;
@@ -23,59 +23,94 @@ export const useAudio = create<AudioState>((set, get) => ({
   splashSound: null,
   isMuted: false, // Start with sound on for better experience
   
-  setBackgroundMusic: (music) => set({ backgroundMusic: music }),
-  setPopSound: (sound) => set({ popSound: sound }),
-  setSplashSound: (sound) => set({ splashSound: sound }),
+  setBackgroundMusic: (audio: HTMLAudioElement) => {
+    // Configure background music for optimal mobile performance
+    audio.preload = 'auto';
+    audio.loop = true;
+    audio.volume = 0.4;
+    
+    // Enable low latency playback if supported
+    if ('mozAutoplayEnabled' in audio || 'webkitAudioContext' in window) {
+      audio.mozPreservesPitch = false;
+      (audio as any).webkitPreservesPitch = false;
+    }
+    
+    set({ backgroundMusic: audio });
+  },
+  
+  setPopSound: (audio: HTMLAudioElement) => {
+    // Configure pop sound for optimal mobile performance
+    audio.preload = 'auto';
+    audio.volume = 0.4;
+    
+    // Create audio pool for rapid succession sounds
+    const audioPool: HTMLAudioElement[] = [audio];
+    for (let i = 0; i < 3; i++) {
+      const clone = audio.cloneNode() as HTMLAudioElement;
+      clone.preload = 'auto';
+      clone.volume = 0.4;
+      audioPool.push(clone);
+    }
+    
+    // Store the original audio
+    set({ popSound: audio });
+    
+    // Attach the pool to the original audio element
+    (audio as any).pool = audioPool;
+    (audio as any).poolIndex = 0;
+  },
+  
+  setSplashSound: (audio: HTMLAudioElement) => {
+    // Configure splash sound for optimal mobile performance
+    audio.preload = 'auto';
+    audio.volume = 0.5;
+    set({ splashSound: audio });
+  },
   
   toggleMute: () => {
     const { isMuted, backgroundMusic } = get();
     const newMutedState = !isMuted;
     
-    // Update the muted state
-    set({ isMuted: newMutedState });
-    
-    // Adjust background music if it exists
     if (backgroundMusic) {
       if (newMutedState) {
         backgroundMusic.pause();
-      } else if (document.visibilityState !== 'hidden') {
-        backgroundMusic.play().catch(err => console.log("Background music auto-play prevented:", err));
+      } else {
+        // Handle mobile audio context resuming
+        if (backgroundMusic.paused) {
+          const resumeAudio = () => {
+            backgroundMusic.play().catch(error => {
+              console.log("Background music play prevented:", error);
+            });
+            document.removeEventListener('touchstart', resumeAudio);
+          };
+          document.addEventListener('touchstart', resumeAudio);
+        }
       }
     }
     
-    // Log the change
-    console.log(`Sound ${newMutedState ? 'muted' : 'unmuted'}`);
+    set({ isMuted: newMutedState });
   },
   
   playPop: () => {
     const { popSound, isMuted } = get();
-    if (popSound) {
-      // If sound is muted, don't play anything
-      if (isMuted) {
-        console.log("Pop sound skipped (muted)");
-        return;
+    if (popSound && !isMuted) {
+      // Use audio pool for rapid succession sounds
+      const pool = (popSound as any).pool as HTMLAudioElement[];
+      if (pool) {
+        const audio = pool[(popSound as any).poolIndex];
+        audio.currentTime = 0;
+        audio.play().catch(error => {
+          console.log("Pop sound play prevented:", error);
+        });
+        (popSound as any).poolIndex = ((popSound as any).poolIndex + 1) % pool.length;
       }
-      
-      // Clone the sound to allow overlapping playback
-      const soundClone = popSound.cloneNode() as HTMLAudioElement;
-      soundClone.volume = 0.4; // Slightly louder for better feedback
-      soundClone.play().catch(error => {
-        console.log("Pop sound play prevented:", error);
-      });
     }
   },
   
   playSplash: () => {
     const { splashSound, isMuted } = get();
-    if (splashSound) {
-      // If sound is muted, don't play anything
-      if (isMuted) {
-        console.log("Splash sound skipped (muted)");
-        return;
-      }
-      
+    if (splashSound && !isMuted) {
       splashSound.currentTime = 0;
-      splashSound.volume = 0.5;
       splashSound.play().catch(error => {
         console.log("Splash sound play prevented:", error);
       });

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, memo } from "react";
 import { CandyObject } from "@/lib/stores/useCandyGame";
 import { motion } from "framer-motion";
 
@@ -40,7 +40,7 @@ const bubbleColors = {
   }
 };
 
-const Bubble: React.FC<CandyProps> = ({ candy, size }) => {
+const Bubble: React.FC<CandyProps> = memo(({ candy, size }) => {
   const [animate, setAnimate] = useState(false);
 
   // Trigger animations
@@ -104,6 +104,11 @@ const Bubble: React.FC<CandyProps> = ({ candy, size }) => {
         damping: 15
       }}
       className="w-full h-full flex items-center justify-center"
+      style={{
+        willChange: 'transform',
+        transform: 'translateZ(0)',
+        backfaceVisibility: 'hidden'
+      }}
     >
       <div 
         className="bubble rounded-full relative overflow-hidden"
@@ -115,7 +120,10 @@ const Bubble: React.FC<CandyProps> = ({ candy, size }) => {
             ? `0 0 15px 5px ${colors.highlight}, 0 0 0 3px white` 
             : `inset 0px -10px 20px rgba(0,0,0,0.3), inset 0px 5px 10px rgba(255,255,255,0.5), 0 4px 8px rgba(0,0,0,0.3)`,
           border: candy.isSelected ? `4px solid white` : `2px solid rgba(255,255,255,0.4)`,
-          ...specialStyles
+          ...specialStyles,
+          willChange: 'transform, opacity',
+          transform: 'translateZ(0)',
+          backfaceVisibility: 'hidden'
         }}
       >
         {/* Shine effect */}
@@ -142,23 +150,25 @@ const Bubble: React.FC<CandyProps> = ({ candy, size }) => {
       {/* Match effect particles - water droplets */}
       {candy.isMatched && (
         <div className="absolute inset-0 flex items-center justify-center">
-          {[...Array(10)].map((_, i) => (
+          {[...Array(Math.min(6, 10))].map((_, i) => (
             <motion.div
               key={`particle-${i}`}
               initial={{ opacity: 1, scale: 0.5 }}
               animate={{
                 opacity: 0,
                 scale: 1.5,
-                x: Math.sin(i * Math.PI/5) * size * 1.2,
-                y: Math.cos(i * Math.PI/5) * size * 1.2
+                x: Math.sin(i * Math.PI/3) * size,
+                y: Math.cos(i * Math.PI/3) * size
               }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.4 }}
               className="absolute rounded-full"
               style={{ 
                 width: 4 + Math.random() * 4,
                 height: 4 + Math.random() * 4,
                 background: `radial-gradient(circle at 30% 30%, white, ${colors.highlight})`,
-                boxShadow: `0 0 2px rgba(255,255,255,0.8)`
+                boxShadow: `0 0 2px rgba(255,255,255,0.8)`,
+                willChange: 'transform',
+                transform: 'translateZ(0)'
               }}
             />
           ))}
@@ -166,6 +176,6 @@ const Bubble: React.FC<CandyProps> = ({ candy, size }) => {
       )}
     </motion.div>
   );
-};
+});
 
 export default Bubble;
