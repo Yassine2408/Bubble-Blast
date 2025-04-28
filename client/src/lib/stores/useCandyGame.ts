@@ -296,7 +296,7 @@ export const useCandyGame = create<GameState>()(
       
       // Play sound for matches
       if (matchCount > 0) {
-        useAudio.getState().playHit();
+        useAudio.getState().playPop();
       }
       
       // Update the board with matched candies

@@ -44,7 +44,7 @@ const Board: React.FC = () => {
         style={{ 
           width: cellSize * level.cols,
           height: cellSize * level.rows,
-          backgroundImage: 'url("/textures/water-background.png")',
+          backgroundImage: 'url("/textures/water-pattern.svg")',
           backgroundSize: 'cover',
           backgroundBlendMode: 'soft-light',
         }}

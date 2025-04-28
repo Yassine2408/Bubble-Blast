@@ -7,16 +7,16 @@ import Confetti from "react-confetti";
 
 const GameOver: React.FC = () => {
   const { score, level, restart } = useCandyGame();
-  const { successSound, playSuccess, isMuted } = useAudio();
+  const { splashSound, playSplash, isMuted } = useAudio();
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
   });
 
   useEffect(() => {
-    // Play success sound
+    // Play splash sound
     if (!isMuted) {
-      playSuccess();
+      playSplash();
     }
 
     // Update window size for confetti
@@ -29,7 +29,7 @@ const GameOver: React.FC = () => {
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [playSuccess, isMuted]);
+  }, [playSplash, isMuted]);
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">

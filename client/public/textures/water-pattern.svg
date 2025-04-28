@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="water-pattern" patternUnits="userSpaceOnUse" width="100" height="100">
+      <path d="M25,50 Q50,30 75,50 T125,50" stroke="#FFFFFF" stroke-width="1.5" fill="none" opacity="0.15" />
+      <path d="M25,60 Q50,40 75,60 T125,60" stroke="#FFFFFF" stroke-width="1.5" fill="none" opacity="0.12" />
+      <path d="M25,70 Q50,50 75,70 T125,70" stroke="#FFFFFF" stroke-width="1.5" fill="none" opacity="0.1" />
+      <path d="M-25,80 Q0,60 25,80 T75,80" stroke="#FFFFFF" stroke-width="1.5" fill="none" opacity="0.08" />
+      <path d="M25,20 Q50,0 75,20 T125,20" stroke="#FFFFFF" stroke-width="1.5" fill="none" opacity="0.05" />
+    </pattern>
+  </defs>
+  <rect width="400" height="400" fill="url(#water-pattern)" />
+</svg>

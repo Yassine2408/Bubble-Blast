@@ -11,9 +11,9 @@ import "@fontsource/inter";
 function App() {
   const { phase, init } = useCandyGame();
   const [backgroundAudio, setBackgroundAudio] = useState<HTMLAudioElement | null>(null);
-  const [hitAudio, setHitAudio] = useState<HTMLAudioElement | null>(null);
-  const [successAudio, setSuccessAudio] = useState<HTMLAudioElement | null>(null);
-  const { setBackgroundMusic, setHitSound, setSuccessSound } = useAudio();
+  const [popAudio, setPopAudio] = useState<HTMLAudioElement | null>(null);
+  const [splashAudio, setSplashAudio] = useState<HTMLAudioElement | null>(null);
+  const { setBackgroundMusic, setPopSound, setSplashSound, isMuted } = useAudio();
 
   // Initialize the game
   useEffect(() => {
@@ -28,23 +28,28 @@ function App() {
     bgMusic.volume = 0.4;
     setBackgroundAudio(bgMusic);
     setBackgroundMusic(bgMusic);
+    
+    // Auto-play background music if not muted
+    if (!isMuted) {
+      bgMusic.play().catch(err => console.log("Background music auto-play prevented:", err));
+    }
 
-    const hitSound = new Audio("/sounds/hit.mp3");
-    hitSound.volume = 0.3;
-    setHitAudio(hitSound);
-    setHitSound(hitSound);
+    const popSound = new Audio("/sounds/hit.mp3");
+    popSound.volume = 0.4;
+    setPopAudio(popSound);
+    setPopSound(popSound);
 
-    const successSound = new Audio("/sounds/success.mp3");
-    successSound.volume = 0.5;
-    setSuccessAudio(successSound);
-    setSuccessSound(successSound);
+    const splashSound = new Audio("/sounds/success.mp3");
+    splashSound.volume = 0.5;
+    setSplashAudio(splashSound);
+    setSplashSound(splashSound);
 
     return () => {
       bgMusic.pause();
-      hitSound.pause();
-      successSound.pause();
+      popSound.pause();
+      splashSound.pause();
     };
-  }, [setBackgroundMusic, setHitSound, setSuccessSound]);
+  }, [setBackgroundMusic, setPopSound, setSplashSound, isMuted]);
 
   return (
     <QueryClientProvider client={queryClient}>

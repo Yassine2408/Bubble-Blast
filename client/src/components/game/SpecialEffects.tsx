@@ -9,6 +9,7 @@ interface Particle {
   scale: number;
   rotation: number;
   color: string;
+  type: 'bubble' | 'droplet' | 'splash';
 }
 
 const SpecialEffects: React.FC = () => {
@@ -19,7 +20,7 @@ const SpecialEffects: React.FC = () => {
     value: 0 
   });
   
-  const colors = ["#FF5555", "#FF9933", "#FFDD44", "#44CC44", "#3399FF", "#9955FF"];
+  const bubbleColors = ["#FF6B6B", "#FF9F4A", "#FFE66D", "#4ECDC4", "#3F88C5", "#7CB9E8"];
   
   // Generate particles when score changes
   useEffect(() => {
@@ -31,13 +32,19 @@ const SpecialEffects: React.FC = () => {
     const count = Math.min(15, Math.floor(score / 100) + 5);
     
     for (let i = 0; i < count; i++) {
+      // Randomly choose particle type
+      const particleType = Math.random() > 0.7 
+        ? 'droplet' 
+        : Math.random() > 0.4 ? 'splash' : 'bubble';
+      
       newParticles.push({
         id: `particle-${Date.now()}-${i}`,
         x: Math.random() * window.innerWidth,
         y: Math.random() * window.innerHeight,
         scale: Math.random() * 0.5 + 0.5,
         rotation: Math.random() * 360,
-        color: colors[Math.floor(Math.random() * colors.length)]
+        color: bubbleColors[Math.floor(Math.random() * bubbleColors.length)],
+        type: particleType
       });
     }
     
@@ -63,6 +70,71 @@ const SpecialEffects: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, [combo]);
+
+  // Render different particle types
+  const renderParticle = (particle: Particle) => {
+    switch (particle.type) {
+      case 'bubble':
+        return (
+          <div 
+            style={{ 
+              position: "absolute",
+              width: "20px",
+              height: "20px",
+              borderRadius: "50%",
+              background: `radial-gradient(circle at 30% 30%, ${particle.color}cc, ${particle.color}ff)`,
+              boxShadow: `inset 0px -3px 5px rgba(0,0,0,0.3), inset 0px 2px 5px rgba(255,255,255,0.5), 0 1px 2px rgba(0,0,0,0.3)`,
+              border: `1px solid rgba(255,255,255,0.3)`
+            }}
+          >
+            {/* Shine effect */}
+            <div 
+              className="absolute left-[15%] top-[15%] rounded-full opacity-80"
+              style={{
+                width: "30%",
+                height: "30%",
+                background: "radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 70%)"
+              }}
+            />
+          </div>
+        );
+      
+      case 'droplet':
+        return (
+          <div
+            style={{
+              position: "absolute",
+              width: "14px",
+              height: "18px",
+              borderRadius: "70% 70% 60% 60% / 70% 70% 40% 40%",
+              background: `radial-gradient(circle at 40% 40%, rgba(255,255,255,0.8), ${particle.color}ee)`,
+              boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
+              transform: "rotate(20deg)",
+            }}
+          />
+        );
+        
+      case 'splash':
+        return (
+          <svg width="24" height="24" viewBox="0 0 24 24" style={{ position: "absolute" }}>
+            <circle cx="12" cy="12" r="2" fill="rgba(255,255,255,0.8)" />
+            <g stroke={particle.color} strokeWidth="1.5" strokeLinecap="round">
+              <line x1="12" y1="5" x2="12" y2="7" />
+              <line x1="12" y1="17" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="7" y2="12" />
+              <line x1="17" y1="12" x2="19" y2="12" />
+              <line x1="7.5" y1="7.5" x2="9" y2="9" />
+              <line x1="15" y1="15" x2="16.5" y2="16.5" />
+              <line x1="7.5" y1="16.5" x2="9" y2="15" />
+              <line x1="15" y1="9" x2="16.5" y2="7.5" />
+            </g>
+          </svg>
+        );
+        
+      default:
+        return null;
+    }
+  };
   
   return (
     <div className="special-effects absolute inset-0 pointer-events-none overflow-hidden">
@@ -85,15 +157,17 @@ const SpecialEffects: React.FC = () => {
               opacity: [0, 1, 0] 
             }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 2, ease: "easeOut" }}
-            style={{ 
-              position: "absolute",
-              width: "20px",
-              height: "20px",
-              borderRadius: "50%",
-              background: particle.color
+            transition={{ 
+              duration: 2, 
+              ease: "easeOut",
+              opacity: {
+                times: [0, 0.2, 1],
+                duration: 2
+              }
             }}
-          />
+          >
+            {renderParticle(particle)}
+          </motion.div>
         ))}
       </AnimatePresence>
       
@@ -115,11 +189,11 @@ const SpecialEffects: React.FC = () => {
             <div 
               className="text-4xl md:text-6xl font-bold"
               style={{
-                color: "#FFDD44",
-                textShadow: "0 0 10px rgba(255,221,68,0.7), 0 0 20px rgba(255,221,68,0.5), 0 2px 0 #CC7722, 0 4px 0 rgba(0,0,0,0.2)"
+                color: "#7CB9E8",
+                textShadow: "0 0 10px rgba(124,185,232,0.7), 0 0 20px rgba(124,185,232,0.5), 0 2px 0 #3F88C5, 0 4px 0 rgba(0,0,0,0.2)"
               }}
             >
-              {comboEffect.value}x COMBO!
+              {comboEffect.value}x SPLASH!
             </div>
           </motion.div>
         )}
