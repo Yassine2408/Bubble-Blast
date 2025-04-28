@@ -117,7 +117,7 @@ const StartScreen: React.FC = () => {
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
             <Button
-              variant="candy"
+              variant="bubble"
               size="xl"
               onClick={start}
               className="font-bold text-white min-w-32 sm:min-w-40 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
@@ -209,7 +209,7 @@ const StartScreen: React.FC = () => {
             
             <div className="mt-6 flex justify-center">
               <Button
-                variant="candy"
+                variant="bubble"
                 onClick={toggleInstructions}
                 className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
               >

@@ -98,7 +98,7 @@ const GameOver: React.FC = () => {
             className="flex justify-center"
           >
             <Button
-              variant="candy"
+              variant="bubble"
               size="xl"
               onClick={restart}
               className="font-bold text-white shadow-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
