@@ -9,34 +9,34 @@ interface CandyProps {
 
 const bubbleColors = {
   red: {
-    bg: "#FF6B6B",
-    highlight: "#FFB6B6",
-    shadow: "#D14848"
+    bg: "#FF3333",
+    highlight: "#FF8888",
+    shadow: "#CC0000"
   },
   orange: {
-    bg: "#FF9F4A",
-    highlight: "#FFC68C",
-    shadow: "#D37C29"
+    bg: "#FF8800",
+    highlight: "#FFBB66",
+    shadow: "#CC6600"
   },
   yellow: {
-    bg: "#FFE66D",
-    highlight: "#FFF2AD",
-    shadow: "#D4BC51"
+    bg: "#FFDD00",
+    highlight: "#FFEE88",
+    shadow: "#CC9900"
   },
   green: {
-    bg: "#4ECDC4",
-    highlight: "#8FDFDA",
-    shadow: "#36A59E"
+    bg: "#00BB00",
+    highlight: "#99EE99",
+    shadow: "#008800"
   },
   blue: {
-    bg: "#3F88C5",
-    highlight: "#7FBBDF",
-    shadow: "#2C5F8C"
+    bg: "#0088FF",
+    highlight: "#99CCFF",
+    shadow: "#0055BB"
   },
   purple: {
-    bg: "#7CB9E8",
-    highlight: "#B6DAF2",
-    shadow: "#5A94CC"
+    bg: "#AA00FF",
+    highlight: "#DD99FF",
+    shadow: "#7700CC"
   }
 };
 

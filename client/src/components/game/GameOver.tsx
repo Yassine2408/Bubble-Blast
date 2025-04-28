@@ -39,7 +39,7 @@ const GameOver: React.FC = () => {
         recycle={false}
         numberOfPieces={300}
         gravity={0.2}
-        colors={['#FF6B6B', '#FF9F4A', '#FFE66D', '#4ECDC4', '#3F88C5', '#7CB9E8']}
+        colors={['#FF3333', '#FF8800', '#FFDD00', '#00BB00', '#0088FF', '#AA00FF']}
       />
       
       <motion.div

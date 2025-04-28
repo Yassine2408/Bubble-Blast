@@ -11,12 +11,12 @@ const StartScreen: React.FC = () => {
   const [showInstructions, setShowInstructions] = useState(false);
   
   const bubbleColors = [
-    "#4ECDC4", // teal
-    "#FF6B6B", // coral
-    "#FFE66D", // light yellow
-    "#1A535C", // dark teal
-    "#3F88C5", // blue
-    "#7CB9E8", // lighter blue
+    "#00BB00", // bright green
+    "#FF3333", // bright red
+    "#FFDD00", // bright yellow
+    "#0088FF", // bright blue
+    "#FF8800", // bright orange
+    "#AA00FF", // bright purple
   ];
   
   // Generate floating bubble backgrounds

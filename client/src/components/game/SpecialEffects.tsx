@@ -20,7 +20,7 @@ const SpecialEffects: React.FC = () => {
     value: 0 
   });
   
-  const bubbleColors = ["#FF6B6B", "#FF9F4A", "#FFE66D", "#4ECDC4", "#3F88C5", "#7CB9E8"];
+  const bubbleColors = ["#FF3333", "#FF8800", "#FFDD00", "#00BB00", "#0088FF", "#AA00FF"];
   
   // Generate particles when score changes
   useEffect(() => {
@@ -189,8 +189,8 @@ const SpecialEffects: React.FC = () => {
             <div 
               className="text-4xl md:text-6xl font-bold"
               style={{
-                color: "#7CB9E8",
-                textShadow: "0 0 10px rgba(124,185,232,0.7), 0 0 20px rgba(124,185,232,0.5), 0 2px 0 #3F88C5, 0 4px 0 rgba(0,0,0,0.2)"
+                color: "#0088FF",
+                textShadow: "0 0 10px rgba(0,136,255,0.7), 0 0 20px rgba(0,136,255,0.5), 0 2px 0 #0055BB, 0 4px 0 rgba(0,0,0,0.2)"
               }}
             >
               {comboEffect.value}x SPLASH!
